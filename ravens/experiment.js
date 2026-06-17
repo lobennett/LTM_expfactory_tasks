@@ -1,9 +1,6 @@
 // Preload images
 // Using git commit hash for compatibility with expfactory
-// TODO: Update GIT_HASH to a real commit hash from this repository after the
-// first deploy. The placeholder below is carried over and will not resolve
-// until the LTM_expfactory_tasks repo has been pushed and deployed.
-var GIT_HASH = '142986a6f28946223d8cb0b942ac0d0690edf7a8';
+var GIT_HASH = 'd98703dcfc172eb71b44263d3574c131dbfef164';
 var pathSource =
   'https://deploy.expfactory.org/deployment/repo/LTM_expfactory_tasks/' +
   GIT_HASH +
