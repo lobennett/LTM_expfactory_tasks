@@ -20,6 +20,20 @@ images.push(pathSource + 'practice/sample_matrix_bottom.jpg');
 images.push(pathSource + 'practice/sample_matrix_top.jpg');
 images.push(pathSource + 'practice/Opt_E_selected.png');
 
+// Warm the browser cache in the background as soon as this script runs. The
+// matrices are embedded in HTML-string stimuli, which jsPsych does not
+// auto-preload, so without this each image is fetched over the network the
+// moment its trial appears. Kicking the requests off here means they download
+// silently while the participant goes through the welcome and instructions,
+// with no visible loading screen, so trials render from cache. Image objects
+// are kept in an array so the in-flight requests are not garbage collected.
+var preloadedImages = [];
+images.forEach(function (url) {
+  var img = new Image();
+  img.src = url;
+  preloadedImages.push(img);
+});
+
 // Helper functions
 const getInstructFeedback = () =>
   `<div class="centerbox"><p class="center-block-text">${feedbackInstructText}</p></div>`;
