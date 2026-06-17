@@ -1,0 +1,226 @@
+// Helper functions
+const getInstructFeedback = () =>
+  `<div class="centerbox"><p class="center-block-text">${feedbackInstructText}</p></div>`;
+
+// Map survey responses to question prompts
+const mapResponsesToQuestions = (data, surveyQuestions, likertScale) => {
+  Object.keys(data.response).forEach((key, idx) => {
+    const question = surveyQuestions[idx];
+    if (question && question.prompt) {
+      const responseIndex = data.response[key];
+      const questionCleaned = question.prompt
+        .replace(/[.,-]/g, '')
+        .replace(/\s+/g, '_')
+        .toLowerCase();
+      // If no response, set to "NA"
+      if (responseIndex === '') {
+        data[questionCleaned] = 'NA';
+      } else {
+        const scaleValue = likertScale[responseIndex];
+        const scaleValueCleaned = scaleValue.replace(/\s+/g, '_').toLowerCase();
+        data[questionCleaned] = scaleValueCleaned;
+      }
+    }
+  });
+};
+
+var feedbackInstructText = `
+  <p class="center-block-text">
+    Welcome! This experiment will take around 3 minutes.
+  </p>
+  <p class="center-block-text">
+    To avoid technical issues, please keep the experiment tab (on Chrome or Firefox) active and in fullscreen mode for the whole duration of each task.
+  </p>
+  <p class="center-block-text"> Press <i>enter</i> to begin.</p>
+`;
+
+var testTrials = [];
+var likertScale = [
+  'Strongly Disagree',
+  'Disagree',
+  'Somewhat Disagree',
+  'Neutral',
+  'Somewhat Agree',
+  'Agree',
+  'Strongly Agree',
+];
+
+var surveyQuestions = [
+  {
+    prompt: 'I am good at "sizing up" situations.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt:
+      'I have a hard time making decisions when faced with difficult situations.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt: 'I consider multiple options before making a decision.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt:
+      'When I encounter difficult situations, I feel like I am losing control.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt:
+      'I like to look at difficult situations from many different angles.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt:
+      'I seek additional information not immediately available before attributing causes to behavior.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt:
+      'When encountering difficult situations, I become so stressed that I can not think of a way to resolve the situation.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt: "I try to think about things from another person's point of view.",
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt:
+      'I find it troublesome that there are so many different ways to deal with difficult situations.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt: "I am good at putting myself in others' shoes.",
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt:
+      "When I encounter difficult situations, I just don't know what to do.",
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt: 'It is important to look at difficult situations from many angles.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt:
+      'When in difficult situations, I consider multiple options before deciding how to behave.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt: 'I often look at a situation from different viewpoints.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt: 'I am capable of overcoming the difficulties in life that I face.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt:
+      'I consider all the available facts and information when attributing causes to behavior.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt: 'I feel I have no power to change things in difficult situations.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt:
+      'When I encounter difficult situations, I stop and try to think of several ways to resolve it.',
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt:
+      "I can think of more than one way to resolve a difficult situation I'm confronted with.",
+    labels: likertScale,
+    required: true,
+  },
+  {
+    prompt:
+      'I consider multiple options before responding to difficult situations.',
+    labels: likertScale,
+    required: true,
+  },
+];
+
+var trial = {
+  type: jsPsychSurveyLikert,
+  preamble:
+    '<div style="text-align: center; margin-top: 100px;"><b>Please use the scale below to indicate the extent to which you agree or disagree with the following statements.</b></div>',
+  questions: surveyQuestions,
+  on_finish: function (data) {
+    data.likert_scale = likertScale;
+    mapResponsesToQuestions(data, surveyQuestions, likertScale);
+  },
+};
+testTrials.push(trial);
+
+var feedbackInstructBlock = {
+  type: jsPsychHtmlKeyboardResponse,
+  choices: ['Enter'],
+  stimulus: getInstructFeedback,
+  data: {
+    trial_id: 'instruction_feedback',
+    trial_duration: 30000,
+  },
+  trial_duration: 30000,
+};
+
+var testNode = {
+  timeline: testTrials,
+  loop_function: function (data) {
+    return false;
+  },
+};
+
+var fullscreen = {
+  type: jsPsychFullscreen,
+  fullscreen_mode: true,
+};
+
+var exitFullscreen = {
+  type: jsPsychFullscreen,
+  fullscreen_mode: false,
+};
+
+var endBlock = {
+  type: jsPsychHtmlKeyboardResponse,
+  data: {
+    trial_id: 'end',
+    exp_id: 'cfi',
+    trial_duration: 10000,
+  },
+  trial_duration: 10000,
+  stimulus: `
+  <div class="centerbox" style="height: 50vh;">
+    <p class="center-block-text">Congratulations for completing the task!</p>
+    <p class="center-block-text">Press <i>enter</i> to continue.</p>
+  </div>`,
+  choices: ['Enter'],
+};
+
+cfi_experiment = [];
+var cfi_init = () => {
+  cfi_experiment.push(fullscreen);
+  cfi_experiment.push(feedbackInstructBlock);
+  cfi_experiment.push(testNode);
+  cfi_experiment.push(endBlock);
+  cfi_experiment.push(exitFullscreen);
+};
